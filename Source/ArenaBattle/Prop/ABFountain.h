@@ -25,6 +25,8 @@ protected:
 
 	virtual bool IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const override;
 
+	virtual void PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker) override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -40,6 +42,12 @@ public:
 	UFUNCTION()
 	void OnRep_ServerRotationYaw();
 
+	UFUNCTION()
+	void OnRep_ServerLightColor();
+
+	UPROPERTY(ReplicatedUsing = OnRep_ServerLightColor)
+	FLinearColor ServerLightColor;
+
 	//서버에서 액터를 돌릴건데 그 값을 복제하라고 지정
 	//콜백 등록
 	UPROPERTY(ReplicatedUsing = OnRep_ServerRotationYaw)
@@ -54,5 +62,11 @@ public:
 
 	//서버로 부터 데이터를 받고, 그 다음 데이터를 받았을 떄까지 걸린 시간.
 	float ClientTimeBetweenLastUpdate = 0.0f;
+
+	//의도적으로 네트워크를 포화 상태로 만들기 위한 변수.
+	//UPROPERTY(Replicated)
+	//TArray<float> BigData;
+
+	//float BigDataElement = 0.0f;
 
 };
