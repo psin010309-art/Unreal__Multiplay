@@ -21,11 +21,11 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual void OnActorChannelOpen(class FInBunch& InBunch, class UNetConnection* Connection);
+	/*virtual void OnActorChannelOpen(class FInBunch& InBunch, class UNetConnection* Connection);
 
 	virtual bool IsNetRelevantFor(const AActor* RealViewer, const AActor* ViewTarget, const FVector& SrcLocation) const override;
 
-	virtual void PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker) override;
+	virtual void PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker) override;*/
 
 public:	
 	// Called every frame
@@ -44,6 +44,16 @@ public:
 
 	UFUNCTION()
 	void OnRep_ServerLightColor();
+
+	//Multicast RPC함수
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastRPCChangeLightColor(const FLinearColor& NewLightColor);
+
+	UFUNCTION(Server, Unreliable, WithValidation)
+	void ServerRPCChangeLightColor();
+
+	UFUNCTION(Client, Unreliable)
+	void ClientRPCChangeLightColor(const FLinearColor& NewLightColor);
 
 	UPROPERTY(ReplicatedUsing = OnRep_ServerLightColor)
 	FLinearColor ServerLightColor;
