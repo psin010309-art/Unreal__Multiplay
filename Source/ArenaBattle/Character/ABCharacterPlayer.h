@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -25,6 +25,8 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_Owner() override;
 	virtual void PostNetInit() override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -71,6 +73,28 @@ protected:
 	ECharacterControlType CurrentCharacterControlType;
 
 	void Attack();
+
+	//AttackCheckHit 오버라이드
+	virtual void AttackHitCheck() override;
+
+	//공격 명령 처리를 위한 ServerRPC.
+	//클라이언트가 -> 서버로 전달.
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerRPCAttack();
+
+	//서버 포함, 모든 클라이언트에 공격 명령 전달을 위한 Multicast
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPCAttack();
+
+	UFUNCTION()
+	void OnRep_CanAttack();
+
+	//공격 중인지 판단하는 변수
+	UPROPERTY(ReplicatedUsing = OnRep_CanAttack)
+	uint8 bCanAttack : 1;
+
+	//공격 애니메이션 재생 시간/길이(단위:초)
+	float AttackTime = 1.4667f;
 
 // UI Section
 protected:
